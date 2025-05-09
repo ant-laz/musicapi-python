@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from typing import Union
+
 from fastapi import FastAPI
 
 # Create an instance of the FastAPI class
@@ -24,3 +26,8 @@ app = FastAPI()
 @app.get("/")
 def root():
     return {"message": "Hello World"}
+
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: Union[str, None] = None):
+    return {"item_id": item_id, "q": q}
