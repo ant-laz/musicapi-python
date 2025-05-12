@@ -46,3 +46,18 @@ module "docker_artifact_registry" {
   name       = local.repo_codename
   format     = { docker = { standard = {} } }
 }
+
+// Google Cloud Service Account
+// https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/iam-service-account
+module "api_sa" {
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v38.0.0"
+  project_id = module.google_cloud_project.project_id
+  name       = "${local.repo_codename}-sa"
+  # non-authoritative roles granted *to* the service accounts on other resources
+  iam_project_roles = {
+    (module.google_cloud_project.project_id) = [
+      "roles/storage.objectUser",
+      "roles/artifactregistry.writer",
+    ]
+  }
+}
