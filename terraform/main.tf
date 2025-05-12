@@ -1,0 +1,48 @@
+#  Copyright 2025 Google LLC
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+// Terraform local variables
+// https://developer.hashicorp.com/terraform/language/values/locals
+// to avoid repeating the same values or expr multiple times in this config
+//
+locals {
+  repo_codename = "musicapipython"
+}
+
+// Google Cloud Project
+// https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/project
+// IF var.project_create = TRUE THEN project_reuse = null THEN new project made
+// IF var.project_create = FALSE THEN project_reuse = {} THEN existing proj used
+module "google_cloud_project" {
+  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v38.0.0"
+  billing_account = var.billing_account
+  project_reuse   = var.project_create ? null : {}
+  name            = var.project_id
+  parent          = var.organization
+  services = [
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "run.googleapis.com"
+  ]
+}
+
+// Google Cloud Artifact Registry
+// https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/artifact-registry
+module "docker_artifact_registry" {
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/artifact-registry?ref=v38.0.0"
+  project_id = var.project_id
+  location   = var.region
+  name       = local.repo_codename
+  format     = { docker = { standard = {} } }
+}
