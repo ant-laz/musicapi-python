@@ -22,4 +22,6 @@ COPY ./app /code/app
 # Set the command to use fastapi run, which uses Uvicorn underneath.
 # CMD takes a list of strings, each of these strings is what you would type in the command line separated by spaces.
 # This command will be run from the current working directory, the same /code directory you set above with WORKDIR /code.
-CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
+# Cloud run has a "Container runtime contract" that specifies the app should listen on 0.0.0.0 using port 8080
+# https://cloud.google.com/run/docs/container-contract#port
+CMD ["uvicorn", "app.main:musicapi", "--host", "0.0.0.0", "--port",  "8080"]

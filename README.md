@@ -1,7 +1,7 @@
 # musicapi-python
 A demo API for a fictional music application written in Python
 
-## How to execute this solution
+## How to execute this solution on Google Cloud
 
 ### Set up an environment on Google Cloud using Terraform
 
@@ -39,25 +39,39 @@ Run the following command to apply the Terraform configuration.
 terraform apply
 ```
 
+### Use Cloud Build to create a Docker Image
 
-## setup
+Ensure you are at the root directory of the project, the same level as the Dockefile.
 
-ensure you are using python 3.11 or higher
-
-active a virual environment
+Submit the Dockerfile to Cloud Build to create a Docker Image on Artifact Registry
 
 ```shell
-python -m venv venv
+gcloud builds submit \
+--config cloudbuild.yaml \
+--region europe-west2
 ```
 
-install the rewquirements for the project
+### Use Cloud Build to execute a Docker Container
+
+Submit the Docker image, on Artifact Registry, to Cloud Run which executes a Docker Container of it.
 
 ```shell
-pip install -r requirements.txt
+gcloud run deploy musicapipython \
+--image europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1 \
+--region europe-west2 \
+--allow-unauthenticated
 ```
 
-## launch development server
+Image 'europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1' not found.
+
+## How to execute this app locally
+
+https://cloud.google.com/run/docs/testing/local
 
 ```shell
-fastapi dev main.py
+gcloud auth configure-docker europe-west2-docker.pkg.dev
+```
+
+```shell
+PORT=8080 && docker run -p 9090:${PORT} -e PORT=${PORT} europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1
 ```

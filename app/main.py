@@ -14,20 +14,16 @@
 
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 # Create an instance of the FastAPI class
-app = FastAPI()
+musicapi = FastAPI()
 
 # create a path (aka endpoint or route) + operation
 # path is the base path "/"
 # operation is one of the HTTP methods, in this case GET
 # the "@" is a python decorator that tells Fast API the "root" method is for GET operations on "/"
-@app.get("/")
-def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+# this endpoint is a "health check" to allow developers to assess if deployemnts have been successful
+@musicapi.get("/")
+def healthcheck():
+    return Response("server is running")
