@@ -33,7 +33,8 @@ module "google_cloud_project" {
   services = [
     "artifactregistry.googleapis.com",
     "cloudbuild.googleapis.com",
-    "run.googleapis.com"
+    "run.googleapis.com",
+    "compute.googleapis.com",
   ]
 }
 
