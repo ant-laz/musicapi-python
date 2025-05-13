@@ -80,6 +80,18 @@ module "spanner_instace" {
   databases = {
     musicapipython-database = {
       database_dialect = "GOOGLE_STANDARD_SQL"
+      // using "heredoc" strings to express DDL cleanly across multiple lines
+      // https://developer.hashicorp.com/terraform/language/expressions/strings#heredoc-strings
+      ddl = [
+        <<MYDDLSQL
+        CREATE TABLE Singers (
+          SingerId   INT64 NOT NULL,
+          FirstName  STRING(1024),
+          LastName   STRING(1024),
+          BirthDate  DATE
+        ) PRIMARY KEY(SingerId);
+        MYDDLSQL
+      ]
     }
   }
 }
