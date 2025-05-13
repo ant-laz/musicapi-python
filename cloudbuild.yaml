@@ -12,10 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+# https://cloud.google.com/build/docs/building/store-artifacts-in-artifact-registry#docker
+# https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values#map_substitutions_automatically
+
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  script: |
-    docker build -t europe-west2-docker.pkg.dev/$PROJECT_ID/musicapipython/api-image:tag1 .
-  automapSubstitutions: true
+  args: [ 'build', '-t', '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}', '.' ]
 images:
-- 'europe-west2-docker.pkg.dev/$PROJECT_ID/musicapipython/api-image:tag1'
+- '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}'

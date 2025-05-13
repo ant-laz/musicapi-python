@@ -27,3 +27,7 @@ musicapi = FastAPI()
 @musicapi.get("/")
 def healthcheck():
     return Response("server is running")
+
+@musicapi.get("/singers")
+def singersfetch():
+    return Response("fetching singers")

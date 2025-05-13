@@ -39,6 +39,19 @@ Run the following command to apply the Terraform configuration.
 terraform apply
 ```
 
+### Set up environment variables
+
+navigate up to the root of the repository
+```shell
+cd ..
+```
+
+execute the bash script, created by terraform, to make some env vars
+```shell
+source scripts/00_set_variables.sh
+
+### Insert dummy data into the Terraformed Spanner Instance + Database
+
 In spanner studio execute the following SQL to populate our database table with some records
 ```sql
         INSERT INTO 
@@ -61,7 +74,7 @@ In spanner studio execute the following SQL to populate our database table with 
         (15, "Sam", "Smith", "1992-05-19");
 ```
 
-### Use Cloud Build to create a Docker Image
+### Use Cloud Build to create a Docker Image of the application
 
 Ensure you are at the root directory of the project, the same level as the Dockefile.
 
@@ -70,16 +83,20 @@ Submit the Dockerfile to Cloud Build to create a Docker Image on Artifact Regist
 ```shell
 gcloud builds submit \
 --config cloudbuild.yaml \
---region europe-west2
+--region ${LOCATION}  \
+--service-account projects/${PROJECT_ID}/serviceAccounts/${SERVICE_ACCOUNT_EMAIL} \
+--default-buckets-behavior REGIONAL_USER_OWNED_BUCKET \
+--substitutions=_CODE_REPO_NAME="${_CODE_REPO_NAME}",_IMAGE_NAME="${_IMAGE_NAME}",_IMAGE_TAG="${_IMAGE_TAG}"
 ```
 
-### Use Cloud Run to execute a Docker Container
+### Use Cloud Run to execute a Docker Container of the application
 
 Submit the Docker image, on Artifact Registry, to Cloud Run which executes a Docker Container of it.
 
 ```shell
 gcloud run deploy musicapipython \
---image europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1 \
---region europe-west2 \
---allow-unauthenticated
+--image "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}" \
+--region ${LOCATION} \
+--allow-unauthenticated \
+--service-account ${SERVICE_ACCOUNT_EMAIL}
 ```
