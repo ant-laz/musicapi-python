@@ -73,7 +73,7 @@ gcloud builds submit \
 --region europe-west2
 ```
 
-### Use Cloud Build to execute a Docker Container
+### Use Cloud Run to execute a Docker Container
 
 Submit the Docker image, on Artifact Registry, to Cloud Run which executes a Docker Container of it.
 
@@ -82,18 +82,4 @@ gcloud run deploy musicapipython \
 --image europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1 \
 --region europe-west2 \
 --allow-unauthenticated
-```
-
-Image 'europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1' not found.
-
-## How to execute this app locally
-
-https://cloud.google.com/run/docs/testing/local
-
-```shell
-gcloud auth configure-docker europe-west2-docker.pkg.dev
-```
-
-```shell
-PORT=8080 && docker run -p 9090:${PORT} -e PORT=${PORT} europe-west2-docker.pkg.dev/zaro-joonix-net-prj-app-dev/musicapipython/api-image:tag1
 ```
