@@ -62,14 +62,15 @@ module "api_sa" {
     (module.google_cloud_project.project_id) = [
       "roles/storage.objectUser",
       "roles/artifactregistry.writer",
-      "roles/storage.admin"
+      "roles/storage.admin",
+      "roles/spanner.databaseUser",
     ]
   }
 }
 
 // Google Cloud Spanner Instance & Database
 // https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/spanner-instance
-module "spanner_instace" {
+module "spanner_instance" {
   source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/spanner-instance?ref=v38.0.0"
   project_id = var.project_id
   instance = {
@@ -117,6 +118,7 @@ export SERVICE_ACCOUNT_EMAIL=${module.api_sa.email}
 export _CODE_REPO_NAME=${local.repo_codename}
 export _IMAGE_NAME=${local.image_name}
 export _IMAGE_TAG=${local.image_tag}
-
+export SPANNER_INSTANCE_ID=$(echo "${module.spanner_instance.spanner_instance_id}" | xargs basename)
+export SPANNER_DATABASE_ID=$(echo "${module.spanner_instance.spanner_database_ids.musicapipython-database}" | xargs basename)
 FILE
 }

@@ -98,5 +98,7 @@ gcloud run deploy musicapipython \
 --image "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}" \
 --region ${LOCATION} \
 --allow-unauthenticated \
---service-account ${SERVICE_ACCOUNT_EMAIL}
+--service-account ${SERVICE_ACCOUNT_EMAIL} \
+--set-env-vars "SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID}" \
+--set-env-vars "SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID}"
 ```

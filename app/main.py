@@ -12,9 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from typing import Union
+import os
 
 from fastapi import FastAPI, Response
+
+from google.cloud import spanner
 
 # Create an instance of the FastAPI class
 musicapi = FastAPI()
@@ -30,4 +32,33 @@ def healthcheck():
 
 @musicapi.get("/singers")
 def singersfetch():
-    return Response("fetching singers")
+    # need to fetch my spanner instance ID
+    instanceid = os.environ["SPANNER_INSTANCE_ID"]
+
+    # need to fetch my spanner database ID
+    databaseid = os.environ["SPANNER_DATABASE_ID"]
+
+    # Instantiate a client.
+    spanner_client = spanner.Client()
+    
+    # Get a Cloud Spanner instance by ID.
+    instance = spanner_client.instance(instanceid)
+    
+    # Get a Cloud Spanner database by ID.
+    database = instance.database(databaseid)
+
+    singer_data = {}
+    singer_data["singers"] = []
+
+    # Execute a simple SQL statement.
+    with database.snapshot() as snapshot:
+        results = snapshot.execute_sql(
+            "SELECT SingerId, FirstName, LastName, BirthDate FROM Singers"
+        )
+
+        for row in results:
+            id, firstname, lastname, dateofbirth = row
+            this_singer = {"id": id, "firstname": firstname, "lastname": lastname, "dateofbirth": dateofbirth}
+            singer_data["singers"].append(this_singer)
+
+    return singer_data
