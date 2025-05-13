@@ -89,7 +89,7 @@ module "spanner_instace" {
           FirstName  STRING(1024),
           LastName   STRING(1024),
           BirthDate  DATE
-        ) PRIMARY KEY(SingerId);
+        ) PRIMARY KEY(SingerId)
         MYDDLSQL
       ]
     }
