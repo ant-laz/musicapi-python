@@ -35,6 +35,7 @@ module "google_cloud_project" {
     "cloudbuild.googleapis.com",
     "run.googleapis.com",
     "compute.googleapis.com",
+    "spanner.googleapis.com",
   ]
 }
 
@@ -60,5 +61,25 @@ module "api_sa" {
       "roles/storage.objectUser",
       "roles/artifactregistry.writer",
     ]
+  }
+}
+
+// Google Cloud Spanner Instance & Database
+// https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/spanner-instance
+module "spanner_instace" {
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/spanner-instance?ref=v38.0.0"
+  project_id = var.project_id
+  instance = {
+    name         = "${local.repo_codename}-instance"
+    display_name = "TF instance in ${var.region}"
+    config = {
+      name = "regional-${var.region}"
+    }
+    num_nodes = 1
+  }
+  databases = {
+    musicapipython-database = {
+      database_dialect = "GOOGLE_STANDARD_SQL"
+    }
   }
 }
