@@ -49,6 +49,7 @@ cd ..
 execute the bash script, created by terraform, to make some env vars
 ```shell
 source scripts/00_set_variables.sh
+```
 
 ### Insert dummy data into the Terraformed Spanner Instance + Database
 
