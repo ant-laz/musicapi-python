@@ -30,8 +30,9 @@ musicapi = FastAPI()
 def healthcheck():
     return Response("server is running")
 
-@musicapi.get("/singers")
-def singersfetch():
+# get all singers
+@musicapi.get("/api/v1/singers")
+def fetch_all_singers():
     # need to fetch my spanner instance ID
     instanceid = os.environ["SPANNER_INSTANCE_ID"]
 
@@ -54,6 +55,40 @@ def singersfetch():
     with database.snapshot() as snapshot:
         results = snapshot.execute_sql(
             "SELECT SingerId, FirstName, LastName, BirthDate FROM Singers"
+        )
+
+        for row in results:
+            id, firstname, lastname, dateofbirth = row
+            this_singer = {"id": id, "firstname": firstname, "lastname": lastname, "dateofbirth": dateofbirth}
+            singer_data["singers"].append(this_singer)
+
+    return singer_data
+
+# get a specific singer by ID
+@musicapi.get("/api/v1/singers/{singer_id}")
+def fetch_singer_by_id(singer_id: int):
+    # need to fetch my spanner instance ID
+    instanceid = os.environ["SPANNER_INSTANCE_ID"]
+
+    # need to fetch my spanner database ID
+    databaseid = os.environ["SPANNER_DATABASE_ID"]
+
+    # Instantiate a client.
+    spanner_client = spanner.Client()
+    
+    # Get a Cloud Spanner instance by ID.
+    instance = spanner_client.instance(instanceid)
+    
+    # Get a Cloud Spanner database by ID.
+    database = instance.database(databaseid)
+
+    singer_data = {}
+    singer_data["singers"] = []
+
+    # Execute a simple SQL statement.
+    with database.snapshot() as snapshot:
+        results = snapshot.execute_sql(
+            f"SELECT SingerId, FirstName, LastName, BirthDate FROM Singers WHERE SingerId = {singer_id}"
         )
 
         for row in results:
