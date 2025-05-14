@@ -64,6 +64,42 @@ def fetch_all_singers():
 
     return singer_data
 
+# get all singers using cursor based pagination
+@musicapi.get("/api/v2/singers")
+def fetch_all_singers_paginated(cursor: int, page_size: int):
+    # need to fetch my spanner instance ID
+    instanceid = os.environ["SPANNER_INSTANCE_ID"]
+
+    # need to fetch my spanner database ID
+    databaseid = os.environ["SPANNER_DATABASE_ID"]
+
+    # Instantiate a client.
+    spanner_client = spanner.Client()
+    
+    # Get a Cloud Spanner instance by ID.
+    instance = spanner_client.instance(instanceid)
+    
+    # Get a Cloud Spanner database by ID.
+    database = instance.database(databaseid)
+
+    singer_data = {}
+    singer_data["singers"] = []
+    singer_data["next_cursor"] = ""
+
+    # Execute a simple SQL statement.
+    with database.snapshot() as snapshot:
+        results = snapshot.execute_sql(
+            f"SELECT SingerId, FirstName, LastName, BirthDate FROM Singers WHERE SingerId >= {cursor} ORDER BY SingerId LIMIT {page_size}"
+        )
+
+        for row in results:
+            id, firstname, lastname, dateofbirth = row
+            this_singer = {"id": id, "firstname": firstname, "lastname": lastname, "dateofbirth": dateofbirth}
+            singer_data["singers"].append(this_singer)
+            singer_data["next_cursor"] = int(id)+1
+
+    return singer_data
+
 # get a specific singer by ID
 @musicapi.get("/api/v1/singers/{singer_id}")
 def fetch_singer_by_id(singer_id: int):
