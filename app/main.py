@@ -100,6 +100,14 @@ def fetch_all_singers_paginated(cursor: int, page_size: int):
 
     return singer_data
 
+# get all singers using cursor based pagination using SQLAlchemy ORM
+# TODO: https://cloud.google.com/spanner/docs/use-sqlalchemy
+# TODO: https://github.com/googleapis/python-spanner-sqlalchemy#readme
+# TODO: https://github.com/googleapis/python-spanner-sqlalchemy/blob/main/samples/snippets.py
+@musicapi.get("/api/v3/singers")
+def fetch_all_singers_paginated_sqlalchemy(cursor: int, page_size: int):
+    return ""
+
 # get a specific singer by ID
 @musicapi.get("/api/v1/singers/{singer_id}")
 def fetch_singer_by_id(singer_id: int):
