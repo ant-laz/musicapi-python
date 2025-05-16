@@ -101,5 +101,6 @@ gcloud run deploy musicapipython \
 --allow-unauthenticated \
 --service-account ${SERVICE_ACCOUNT_EMAIL} \
 --set-env-vars "SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID}" \
---set-env-vars "SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID}"
+--set-env-vars "SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID}" \
+--set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
 ```
