@@ -112,7 +112,7 @@ def fetch_all_singers_paginated(cursor: int, page_size: int):
     return singer_data
 
 ###############################################################################
-# 2. Basic API with SQL Alchemy ORM & cursor based pagination
+# 3. Basic API with SQL Alchemy ORM & cursor based pagination
 # ---------------------
 # Uses the Google created spanner dialect for SQLAlchemy
 # https://github.com/googleapis/python-spanner-sqlalchemy
