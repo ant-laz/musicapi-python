@@ -75,6 +75,38 @@ In spanner studio execute the following SQL to populate our database table with 
         (15, "Sam", "Smith", "1992-05-19");
 ```
 
+```sql
+        INSERT INTO 
+        Albums (AlumbId, Name, ReleaseDate) 
+        VALUES 
+        (1, "Thriller", "1982-11-29"),
+        (2, "The Dark Side of the Moon", "1973-03-01"),
+        (3, "21", "2011-01-24"),
+        (4, "Abbey Road", "1969-09-26"),
+        (5, "Nevermind", "1991-09-24"),
+        (6, "Rumours", "1977-02-04"),
+        (7, "Lemonade", "2016-04-23"),
+        (8, "Back in Black", "1980-07-25"),
+        (9, "The Miseducation of Lauryn Hill", "1998-08-25"),
+        (10, "Purple Rain", "1984-06-25");
+```
+
+```sql
+        INSERT INTO 
+        Labels (LabelId, Name, FoundedInDate)
+        VALUES
+        (1, "Universal Music Group", "1934-01-01"),
+        (2, "Sony Music Entertainment", "1929-01-01"),
+        (3, "Warner Music Group", "1958-01-01"),
+        (4, "EMI", "1931-01-01"),
+        (5, "BMG", "2008-01-01"),
+        (6, "Beggars Group", "1977-01-01"),
+        (7, "Concord", "1995-01-01"),
+        (8, "Believe Digital", "2005-01-01"),
+        (9, "HYBE Corporation", "2005-01-01"),
+        (10, "Def Jam Recordings", "1984-01-01");
+```
+
 ### Use Cloud Build to create a Docker Image of the application
 
 Ensure you are at the root directory of the project, the same level as the Dockefile.

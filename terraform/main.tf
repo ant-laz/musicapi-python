@@ -27,7 +27,7 @@ locals {
 // IF var.project_create = TRUE THEN project_reuse = null THEN new project made
 // IF var.project_create = FALSE THEN project_reuse = {} THEN existing proj used
 module "google_cloud_project" {
-  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v38.0.0"
+  source          = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v39.1.0"
   billing_account = var.billing_account
   project_reuse   = var.project_create ? null : {}
   name            = var.project_id
@@ -44,7 +44,7 @@ module "google_cloud_project" {
 // Google Cloud Artifact Registry
 // https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/artifact-registry
 module "docker_artifact_registry" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/artifact-registry?ref=v38.0.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/artifact-registry?ref=v39.1.0"
   project_id = var.project_id
   location   = var.region
   name       = local.repo_codename
@@ -54,9 +54,10 @@ module "docker_artifact_registry" {
 // Google Cloud Service Account
 // https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/iam-service-account
 module "api_sa" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v38.0.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v39.1.0"
   project_id = module.google_cloud_project.project_id
   name       = "${local.repo_codename}-sa"
+  create_ignore_already_exists = true
   # non-authoritative roles granted *to* the service accounts on other resources
   iam_project_roles = {
     (module.google_cloud_project.project_id) = [
@@ -71,7 +72,8 @@ module "api_sa" {
 // Google Cloud Spanner Instance & Database
 // https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/spanner-instance
 module "spanner_instance" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/spanner-instance?ref=v38.0.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/spanner-instance?ref=v39.1.0"
+  instance_create = true
   project_id = var.project_id
   instance = {
     name         = "${local.repo_codename}-instance"
@@ -95,6 +97,22 @@ module "spanner_instance" {
           BirthDate  DATE
         ) PRIMARY KEY(SingerId)
         MYDDLSQL
+        ,
+        <<MYDDLSQL2
+        CREATE TABLE Albums (
+          AlumbId   INT64 NOT NULL,
+          Name  STRING(1024),
+          ReleaseDate  DATE
+        ) PRIMARY KEY(AlumbId)
+        MYDDLSQL2
+        ,
+        <<MYDDLSQL3
+        CREATE TABLE Labels (
+          LabelId   INT64 NOT NULL,
+          Name  STRING(1024),
+          FoundedInDate  DATE
+        ) PRIMARY KEY(LabelId)
+        MYDDLSQL3
       ]
     }
   }
