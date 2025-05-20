@@ -14,7 +14,6 @@
 
 ###############################################################################
 # Note on python package & module structure 
-# The app directory contains everything. 
-# This empty file app/__init__.py, makes the app directory a "Python package" 
-# the name of this package is "app"
+# This empty file db/__init__.py, makes the db directory a "Python sub-package" 
+# the name of this package is "app.db"
 ###############################################################################
