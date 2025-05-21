@@ -1,6 +1,10 @@
 # musicapi-python
 A demo API for a fictional music application written in Python
 
+## demo overview
+
+![Diagram of the demo architecture.](/images/api_demo_architectcure.png)
+
 ## How to execute this solution on Google Cloud
 
 ### Set up an environment on Google Cloud using Terraform
