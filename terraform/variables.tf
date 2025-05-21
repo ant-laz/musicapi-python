@@ -44,3 +44,9 @@ variable "region" {
   description = "The region for resources and networking"
   type        = string
 }
+
+
+variable "developer_email" {
+  description = "The email address of the develop who will impersonate a service account in order to attach that service account to a Cloud Run"
+  type        = string
+}

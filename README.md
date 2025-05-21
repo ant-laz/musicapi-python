@@ -27,6 +27,7 @@ organization = "YOUR_ORGANIZATION_ID"
 project_create = true/false
 project_id = "YOUR_PROJECT_ID"
 region = "YOUR_GCP_LOCATION"
+developer_email = "YOUR_EMAIL_ADDRESS"
 ```
 
 Run the following command to initialize Terraform:
@@ -109,30 +110,24 @@ In spanner studio execute the following SQL to populate our database table with 
 
 ### Use Cloud Build to create a Docker Image of the application
 
+
+
+
+
+### Use Cloud Build to create a Docker Image, push to artifact registry & deploy on cloud run
+
 Ensure you are at the root directory of the project, the same level as the Dockefile.
 
-Submit the Dockerfile to Cloud Build to create a Docker Image on Artifact Registry
+Submit the Dockerfile to Cloud Build to:
+ - create a Docker Image
+ - push the Docker Image to Artifact Registry
+ - deploy the Docker Image from Artifact Registry to Cloud Run
 
 ```shell
 gcloud builds submit \
 --config cloudbuild.yaml \
 --region ${LOCATION}  \
---service-account projects/${PROJECT_ID}/serviceAccounts/${SERVICE_ACCOUNT_EMAIL} \
 --default-buckets-behavior REGIONAL_USER_OWNED_BUCKET \
---substitutions=_CODE_REPO_NAME="${_CODE_REPO_NAME}",_IMAGE_NAME="${_IMAGE_NAME}",_IMAGE_TAG="${_IMAGE_TAG}"
+--substitutions=_CODE_REPO_NAME="${_CODE_REPO_NAME}",_IMAGE_NAME="${_IMAGE_NAME}",_IMAGE_TAG="${_IMAGE_TAG},_SERVICE_ACCOUNT_EMAIL=${SERVICE_ACCOUNT_EMAIL},_SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID},_SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID}"
 ```
 
-### Use Cloud Run to execute a Docker Container of the application
-
-Submit the Docker image, on Artifact Registry, to Cloud Run which executes a Docker Container of it.
-
-```shell
-gcloud run deploy musicapipython \
---image "${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}" \
---region ${LOCATION} \
---allow-unauthenticated \
---service-account ${SERVICE_ACCOUNT_EMAIL} \
---set-env-vars "SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID}" \
---set-env-vars "SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID}" \
---set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
-```

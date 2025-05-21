@@ -58,13 +58,20 @@ module "api_sa" {
   project_id = module.google_cloud_project.project_id
   name       = "${local.repo_codename}-sa"
   create_ignore_already_exists = true
+  # authoritative roles granted *on* the service accounts to other identities
+  iam = {
+    "roles/iam.serviceAccountUser" = ["user:${var.developer_email}"]
+  }
   # non-authoritative roles granted *to* the service accounts on other resources
   iam_project_roles = {
     (module.google_cloud_project.project_id) = [
       "roles/storage.objectUser",
       "roles/artifactregistry.writer",
+      "roles/artifactregistry.reader",
       "roles/storage.admin",
       "roles/spanner.databaseUser",
+      "roles/logging.logWriter",
+      "roles/run.developer"
     ]
   }
 }
@@ -131,6 +138,7 @@ resource "local_file" "variables_script" {
 # We recommend that you modify this file only through the Terraform deployment.
 
 export PROJECT_ID=${module.google_cloud_project.project_id}
+export CLOUDSDK_CORE_PROJECT=${module.google_cloud_project.project_id}
 export LOCATION=${var.region}
 export SERVICE_ACCOUNT_EMAIL=${module.api_sa.email}
 export _CODE_REPO_NAME=${local.repo_codename}

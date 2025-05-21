@@ -12,11 +12,42 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# https://cloud.google.com/build/docs/building/store-artifacts-in-artifact-registry#docker
-# https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values#map_substitutions_automatically
 
+# A build step specifies an action that you want Cloud Build to perform. 
+# For each build step, Cloud Build executes a docker container as an instance of docker run
+# Use the name field of a build step to specify a cloud builder, which is a container image running common tools
+# ref : https://cloud.google.com/build/docs/build-config-file-schema#build_steps
+# ref : https://cloud.google.com/build/docs/building/store-artifacts-in-artifact-registry#docker
+# ref : https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values#map_substitutions_automatically
+# ref : https://cloud.google.com/build/docs/deploying-builds/deploy-cloud-run
 steps:
+# Step 1 build the Docker image. This uses the Docker cloud builder 
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}', '.' ]
+# Step 2 push the Docker image into Artifact Registry. This uses the Docker cloud builder 
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}']
+# Step 3 deploy image to Cloud Run. This uses the cloud-sdk cloud builder.
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+    - 'run'
+    - 'deploy'
+    - 'musicapipython'
+    - '--image'
+    - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}'
+    - '--region'
+    - '$LOCATION'
+    - '--allow-unauthenticated'
+    - '--service-account'
+    - '${_SERVICE_ACCOUNT_EMAIL}'
+    - '--set-env-vars'
+    - 'SPANNER_INSTANCE_ID=${_SPANNER_INSTANCE_ID}'
+    - '--set-env-vars'
+    - 'SPANNER_DATABASE_ID=${_SPANNER_DATABASE_ID}'
+    - '--set-env-vars'
+    - 'GOOGLE_CLOUD_PROJECT=$PROJECT_ID'
+# images specifies the Docker image that must be built successfully, otherwise fail
+# ref : https://cloud.google.com/build/docs/build-config-file-schema#images
 images:
 - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}'
