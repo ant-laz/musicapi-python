@@ -108,12 +108,6 @@ In spanner studio execute the following SQL to populate our database table with 
         (10, "Def Jam Recordings", "1984-01-01");
 ```
 
-### Use Cloud Build to create a Docker Image of the application
-
-
-
-
-
 ### Use Cloud Build to create a Docker Image, push to artifact registry & deploy on cloud run
 
 Ensure you are at the root directory of the project, the same level as the Dockefile.
