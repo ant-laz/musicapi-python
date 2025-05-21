@@ -3,7 +3,7 @@ A demo API for a fictional music application written in Python
 
 ## demo overview
 
-![Diagram of the demo architecture.](/images/api_demo_architectcure.png)
+![Diagram of the demo architecture.](images/api_demo_architecture.png)
 
 ## How to execute this solution on Google Cloud
 
