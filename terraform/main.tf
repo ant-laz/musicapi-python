@@ -52,26 +52,49 @@ module "docker_artifact_registry" {
 }
 
 // Google Cloud Service Account
+// To use for cloud build
+// https://cloud.google.com/compute/docs/access/service-accounts#default_service_account
+// https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/iam-service-account
+ module "build_sa" {
+   source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v39.1.0"
+   project_id = module.google_cloud_project.project_id
+   name       = "build-sa"
+   //If set to true, skip service account creation if a service account with the same email already exists.
+   create_ignore_already_exists = true 
+   # authoritative roles granted *on* the service accounts to other identities
+   iam = {
+     "roles/iam.serviceAccountUser" = ["user:${var.developer_email}"]  //The developer executes build as this SA
+   }
+   # non-authoritative roles granted *to* the service accounts on other resources
+   iam_project_roles = {
+     (module.google_cloud_project.project_id) = [
+       "roles/storage.objectUser",
+       "roles/artifactregistry.writer",
+       "roles/artifactregistry.reader",
+       "roles/storage.admin",
+       "roles/logging.logWriter",
+       "roles/run.developer"
+     ]
+   }
+}
+
+// Google Cloud Service Account
+// Used as the Cloud Run "Service Identity" https://cloud.google.com/run/docs/configuring/services/service-identity
 // https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/iam-service-account
 module "api_sa" {
   source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v39.1.0"
   project_id = module.google_cloud_project.project_id
   name       = "${local.repo_codename}-sa"
+   //If set to true, skip service account creation if a service account with the same email already exists.
   create_ignore_already_exists = true
   # authoritative roles granted *on* the service accounts to other identities
   iam = {
-    "roles/iam.serviceAccountUser" = ["user:${var.developer_email}"]
+    "roles/iam.serviceAccountUser" = ["serviceAccount:${module.build_sa.email}"]  //The build SA deploys so needs this role on this SA
   }
   # non-authoritative roles granted *to* the service accounts on other resources
   iam_project_roles = {
     (module.google_cloud_project.project_id) = [
-      "roles/storage.objectUser",
-      "roles/artifactregistry.writer",
-      "roles/artifactregistry.reader",
-      "roles/storage.admin",
       "roles/spanner.databaseUser",
-      "roles/logging.logWriter",
-      "roles/run.developer"
     ]
   }
 }
@@ -140,10 +163,11 @@ resource "local_file" "variables_script" {
 export PROJECT_ID=${module.google_cloud_project.project_id}
 export CLOUDSDK_CORE_PROJECT=${module.google_cloud_project.project_id}
 export LOCATION=${var.region}
-export SERVICE_ACCOUNT_EMAIL=${module.api_sa.email}
-export _CODE_REPO_NAME=${local.repo_codename}
-export _IMAGE_NAME=${local.image_name}
-export _IMAGE_TAG=${local.image_tag}
+export API_SERVICE_ACCOUNT_EMAIL=${module.api_sa.email}
+export BUILD_SERVICE_ACCOUNT_ID=${module.build_sa.id}
+export CODE_REPO_NAME=${local.repo_codename}
+export IMAGE_NAME=${local.image_name}
+export IMAGE_TAG=${local.image_tag}
 export SPANNER_INSTANCE_ID=$(echo "${module.spanner_instance.spanner_instance_id}" | xargs basename)
 export SPANNER_DATABASE_ID=$(echo "${module.spanner_instance.spanner_database_ids.musicapipython-database}" | xargs basename)
 FILE

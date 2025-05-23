@@ -38,7 +38,6 @@ steps:
     - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_CODE_REPO_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG}'
     - '--region'
     - '$LOCATION'
-    - '--allow-unauthenticated'
     - '--service-account'
     - '${_SERVICE_ACCOUNT_EMAIL}'
     - '--set-env-vars'
