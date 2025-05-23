@@ -130,3 +130,36 @@ gcloud builds submit \
 --substitutions=_CODE_REPO_NAME="${CODE_REPO_NAME}",_IMAGE_NAME="${IMAGE_NAME}",_IMAGE_TAG="${IMAGE_TAG},_SERVICE_ACCOUNT_EMAIL=${API_SERVICE_ACCOUNT_EMAIL},_SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID},_SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID}"
 ```
 
+## using the api once deployed
+
+All Cloud Run services are deployed privately by [default](https://cloud.google.com/run/docs/authenticating/overview). 
+
+For demonstration purposes, we have kept to this default behaviour. For your use case options options [exist](https://cloud.google.com/run/docs/authenticating/overview).
+
+To use the api with a private deployment we turn to the command line
+
+For our health check endpoint
+
+```shell
+curl -X GET ${CLOUD_RUN_URL} \
+-H "Authorization: bearer $(gcloud auth print-identity-token)"
+```
+
+For our singers endpoint
+```shell
+curl -X GET "${CLOUD_RUN_URL}/api/v1/singers?cursor=1&page_size=3" \
+-H "Authorization: bearer $(gcloud auth print-identity-token)"
+```
+
+For our albums endpoint
+```shell
+curl -X GET "${CLOUD_RUN_URL}/api/v1/albums?cursor=1&page_size=3" \
+-H "Authorization: bearer $(gcloud auth print-identity-token)"
+```
+
+For our labels endpoint
+```shell
+curl -X GET "${CLOUD_RUN_URL}/api/v1/labels?cursor=1&page_size=3" \
+-H "Authorization: bearer $(gcloud auth print-identity-token)"
+```
+
